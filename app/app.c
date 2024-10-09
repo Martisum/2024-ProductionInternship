@@ -8,6 +8,7 @@
 #include "ST7789v.h"
 
 
+extern TIM_HandleTypeDef htim7;
 extern DEVICE_MODE_T device_mode;
 extern DEVICE_MODE_T *Device_Mode_str;
 down_list_t *pphead = NULL;
@@ -102,13 +103,16 @@ void LoRaWAN_Func_Process(void)
 
         }
 				
-				/* 你的实验代码位置 */
-				LCD_Clear(WHITE);
-				uint16_t temp = HDC1000_Read_Temper();
-				LCD_ShowString(0,0,"tempe:",BLACK);
-//				debug_printf("[tempe:%u]\r\n",temp);
-				LCD_ShowNum(50,0,temp,5,BLACK);
-				delay_10ms(10);
+        /* 你的实验代码位置 */
+
+        HAL_TIM_Base_Start_IT(&htim7);
+
+        LCD_Clear(WHITE);
+        // uint16_t temp = HDC1000_Read_Temper();
+        // LCD_ShowString(0,0,"tempe:",BLACK);
+        // // debug_printf("[tempe:%u]\r\n",temp);
+        // LCD_ShowNum(50,0,temp,5,BLACK);
+        delay_10ms(10);
 
     }
     break;

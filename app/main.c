@@ -62,6 +62,7 @@ int main(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_RTC_Init();
+    MX_TIM7_Init();
 
     /** 串口初始化 */
     MX_LPUART1_Init(9600);  //MCU与模块相连串口

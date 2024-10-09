@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.ino": "plaintext",
+        "tim.h": "c",
+        "string.h": "c"
+    }
+}
