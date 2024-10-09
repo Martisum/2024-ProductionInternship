@@ -5,6 +5,7 @@
 #include "lorawan_node_driver.h"
 #include "hdc1000.h"
 #include "sensors_test.h"
+#include "ST7789v.h"
 
 
 extern DEVICE_MODE_T device_mode;
@@ -102,6 +103,12 @@ void LoRaWAN_Func_Process(void)
         }
 				
 				/* 你的实验代码位置 */
+				LCD_Clear(WHITE);
+				uint16_t temp = HDC1000_Read_Temper();
+				LCD_ShowString(0,0,"tempe:",BLACK);
+//				debug_printf("[tempe:%u]\r\n",temp);
+				LCD_ShowNum(50,0,temp,5,BLACK);
+				delay_10ms(10);
 
     }
     break;
