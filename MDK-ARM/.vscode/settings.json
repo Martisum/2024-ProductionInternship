@@ -2,6 +2,11 @@
     "files.associations": {
         "*.ino": "plaintext",
         "tim.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "st7789v.h": "c",
+        "xpt2046.h": "c",
+        "gpio.h": "c",
+        "stm32l4xx_hal.h": "c",
+        "menu.h": "c"
     }
 }

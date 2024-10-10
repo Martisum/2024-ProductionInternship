@@ -1,6 +1,23 @@
-Load "..\\..\\Obj\\SW_KFB.axf" 
-* JLink Info: Out of sync , resynchronizing...
-* JLink Info: Out of sync , resynchronizing...
-* JLink Info: Out of sync , resynchronizing...
-Cannot connect to J-LinkError: Flash Download failed  -  Target DLL has been cancelled
-Flash Load finished at 23:08:00
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'LR_TRAIN'
+compiling menu.c...
+..\src\common\menu.c(254): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "const uint8_t *"
+        LCD_ShowString(6, i - navigate[cntpage]->rpos, navigate[cntpage]->itemlist[i].name, BLACK);
+..\src\common\menu.c(413): warning:  #144-D: a value of type "void *" cannot be used to initialize an entity of type "void (*)()"
+          void (*func)() = navigate[cntpage]->itemlist[navigate[cntpage]->pos].chf;
+..\src\common\menu.c(421): warning:  #144-D: a value of type "void *" cannot be used to initialize an entity of type "void (*)()"
+          void (*func)() = navigate[cntpage]->itemlist[navigate[cntpage]->pos].chf;
+..\src\common\menu.c(436): warning:  #144-D: a value of type "void *" cannot be used to initialize an entity of type "void (*)()"
+          void (*func)() = navigate[cntpage]->itemlist[navigate[cntpage]->pos].chf;
+..\src\common\menu.c(444): warning:  #144-D: a value of type "void *" cannot be used to initialize an entity of type "void (*)()"
+          void (*func)() = navigate[cntpage]->itemlist[navigate[cntpage]->pos].chf;
+..\src\common\menu.c(462): warning:  #144-D: a value of type "void *" cannot be used to initialize an entity of type "void (*)()"
+          void (*func)() = navigate[cntpage]->itemlist[navigate[cntpage]->pos].addr;
+..\src\common\menu.c(471): warning:  #144-D: a value of type "void *" cannot be used to initialize an entity of type "void (*)()"
+          void (*func)() = navigate[cntpage]->itemlist[navigate[cntpage]->pos].chf;
+..\src\common\menu.c: 7 warnings, 0 errors
+linking...
+Program Size: Code=32140 RO-data=5160 RW-data=112 ZI-data=16760  
+FromELF: creating hex file...
+"..\..\Obj\SW_KFB.axf" - 0 Error(s), 7 Warning(s).
+Build Time Elapsed:  00:00:03

@@ -222,7 +222,7 @@ void TIM7_IRQHandler(void)
     // LCD_ShowString(0,30,"wzh:",BLACK);
 //    LCD_ShowString(0,0,"wzh:",BLACK);
 //    tmp_cnt++;
-//    LCD_ShowNum(50,0,tmp_cnt,5,BLACK);
+   LCD_ShowNum(50,0,tmp_cnt,5,BLACK);
   /* USER CODE END TIM7_IRQn 1 */
 }
 
