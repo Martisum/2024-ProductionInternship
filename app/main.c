@@ -43,6 +43,7 @@
 #include "ST7789v.h"
 #include "XPT2046.h"
 #include "menu.h"
+#include "sensors_test.h"
 /* USER CODE BEGIN 0 */
 struct  page p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10;
 void  menu_init (void);
@@ -96,7 +97,7 @@ int main(void)
 
     /** 开发板信息打印 */
     LoRaWAN_Borad_Info_Print();
-
+		
     /* Infinite loop */
     /* USER CODE BEGIN WHILE  */
     while (1)
@@ -111,7 +112,7 @@ int main(void)
 //        LoRaWAN_Func_Process();
     }
 }
-
+//测试用
 int weak_down=100;
 float hl_Kp = 10.9;
 void  menu_init ()
@@ -119,13 +120,15 @@ void  menu_init ()
 			//P0
 			{
 					add_subpage     (&p0, "function",   		&p1);
-					add_subpage     (&p0, "round_island",   &p2);
-					add_subpage     (&p0, "Speed",      		&p3);
-					add_subpage     (&p0, "open_loop",  		&p4);
-					add_subpage     (&p0, "differ_pid",  		&p5);
-					add_subpage     (&p0, "none",      			&p6);
-					add_value      (&p0, "*weak_down*",&weak_down,10,NULL);
-					add_value_float(&p0, "*hl_Kp*", &hl_Kp, 0.1, NULL);
+					add_subpage     (&p0, "parameter",   		&p2);
+//					add_value      (&p0, "*weak_down*",&weak_down,10,NULL);
+//					add_value_float(&p0, "*hl_Kp*", &hl_Kp, 0.1, NULL);
+			}
+			{
+					add_func        (&p1, "<temper-test>", temper_test);
+					add_func        (&p1, "<Humidi-test>",Humidi_test);
+//					add_func        (&p1, "<lux-test>",lux_test);
+//					add_func        (&p1, "<pressure-test>",pressure_test);
 			}
 			MenuInit           (&p0);
 }

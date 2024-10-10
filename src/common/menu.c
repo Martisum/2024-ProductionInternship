@@ -522,43 +522,30 @@ uint8_t key_scan(void)
      posx = Pen_Point.X*240.0/2048.0;
      posy = 360-Pen_Point.Y*360.0/2048.0;
 		 debug_printf("\r\n[posx:%u,posy:%u]\r\n",posx,posy);
-		 if(posx>=100 && posx <=140 && posy>=200 && posy<=240)
+		 if(posx>=80 && posx <=130 && posy>=160 && posy<=220)
 		 {
 			 return KEY_UP;
 		 }
-		 if(posx>=100 && posx <=140 && posy>=270 && posy<=310)
+		 if(posx>=80 && posx <=130 && posy>=240 && posy<=300)
 		 {
 			 return KEY_DOWN;
 		 }
+		 if(posx>=20 && posx <=70 && posy>=220 && posy<=260)
+		 {
+			 return KEY_ADD;
+		 }
+		 if(posx>=150 && posx <=200 && posy>=220 && posy<=260)
+		 {
+			 return KEY_SUB;
+		 }
+		 if(posx>=10 && posx <=50 && posy>=280 && posy<=320)
+		 {
+			 return KEY_ENTER;
+		 }
+		 if(posx>=170 && posx <=220 && posy>=280 && posy<=320)
+		 {
+			 return KEY_LEAVE;
+		 }
 	}
-  // ADC_Get_Value();
-//  if (ADCY > MAX_ADC_VAL) {
-//      HAL_Delay(100);
-//      if (ADCY > MAX_ADC_VAL) {
-//          printf("KEY_LEAVE;\n");
-//          return KEY_LEAVE;
-//      }
-//  }
-//  if (ADCX > MAX_ADC_VAL) {
-//      HAL_Delay(KEY_DelayTime);
-//      if (ADCX > MAX_ADC_VAL) {
-//          printf("KEY_SUB;\n");
-//          return KEY_SUB;
-//      }
-//  }
-//  if (ADCX < MIN_ADC_BAL) {
-//      HAL_Delay(KEY_DelayTime);
-//      if (ADCX < MIN_ADC_BAL) {
-//          printf("KEY_ADD;\n");
-//          return KEY_ADD;
-//      }
-//  }
-//  if (HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2) == 0) {
-//      HAL_Delay(KEY_DelayTime);
-//      if ((HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2) == 0)) {
-//          printf("KEY_ENTER;\n");
-//          return KEY_ENTER;
-//      }
-//  }
-//  return 0;
+	return 0;
 }

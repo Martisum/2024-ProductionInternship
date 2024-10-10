@@ -1028,14 +1028,33 @@ void LCD_ShowFloat (uint16_t x,uint16_t y,const double dat,uint8_t num,uint8_t p
 void key_show(void)
 {
 	//上移按键显示
-	LCD_DrawRectangle(100,200,140,240,BLACK);
-	LCD_DrawLine(120,205,120,235,BLACK);
-	LCD_DrawLine(120,205,110,220,BLACK);
-	LCD_DrawLine(120,205,130,220,BLACK);
+	LCD_DrawRectangle(100,160,140,200,BLACK);
+	LCD_DrawLine(120,165,120,195,BLACK);
+	LCD_DrawLine(120,165,110,180,BLACK);
+	LCD_DrawLine(120,165,130,180,BLACK);
 	//下移按键显示
-	LCD_DrawRectangle(100,270,140,310,BLACK);
-	LCD_DrawLine(120,275,120,305,BLACK);
-	LCD_DrawLine(120,305,110,290,BLACK);
-	LCD_DrawLine(120,305,130,290,BLACK);
+	LCD_DrawRectangle(100,230,140,270,BLACK);
+	LCD_DrawLine(120,235,120,265,BLACK);
+	LCD_DrawLine(120,265,110,250,BLACK);
+	LCD_DrawLine(120,265,130,250,BLACK);
+	//增加按键显示
+	LCD_DrawRectangle(30,195,70,235,BLACK);
+	LCD_DrawLine(40,215,60,215,BLACK);
+	LCD_DrawLine(50,205,50,225,BLACK);
+	//减小按键显示
+	LCD_DrawRectangle(170,195,210,235,BLACK);
+	LCD_DrawLine(180,215,200,215,BLACK);
 	//进入按键显示
+	LCD_DrawRectangle(10,270,50,310,BLACK);
+	LCD_DrawLine(40,280,40,295,BLACK);
+	LCD_DrawLine(40,295,15,295,BLACK);
+	LCD_DrawLine(15,295,30,287,BLACK);
+	LCD_DrawLine(15,295,30,303,BLACK);
+	//退出按键显示
+	LCD_DrawRectangle(190,270,230,310,BLACK);
+	LCD_DrawLine(210,300,220,300,BLACK);
+	LCD_DrawLine(220,300,220,280,BLACK);
+	LCD_DrawLine(220,280,200,280,BLACK);
+	LCD_DrawLine(200,280,210,275,BLACK);
+	LCD_DrawLine(200,280,210,285,BLACK);
 }

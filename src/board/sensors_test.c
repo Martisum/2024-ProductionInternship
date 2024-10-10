@@ -4,8 +4,11 @@
 #include "opt3001.h"
 #include "MPL3115.h"
 #include "mma8451.h"
+#include "ST7789v.h"
+#include "menu.h"
+#include "XPT2046.h"
 
-
+extern Pen_Holder Pen_Point;//定义笔实体
 int8_t Error_num = 0;
 
 void Test_task(void)
@@ -122,6 +125,54 @@ void MMA8451_Test(void)
 
     Error_num = 0;
 
+}
+
+void temper_test(void)
+{
+		float temper = 0;
+		while(1)
+		{
+			temper = HDC1000_Read_Temper()*165.0/65536.0-40.0;
+			LCD_ShowString(0,0,"temper:",BLACK);
+			LCD_ShowFloat(60,0,temper,2,3,BLACK);
+			LCD_Clear(WHITE);
+			if(Pen_Point.Key_Sta == 1)
+			{
+					Pen_Point.Key_Sta =0;
+				  float posx = Pen_Point.X*240.0/2048.0;
+					float posy = 360-Pen_Point.Y*360.0/2048.0;
+					if(posx>=170 && posx <=220 && posy>=280 && posy<=320)
+				 {
+					 MenuRender(1);
+					 return;
+				 }
+			}
+			HAL_Delay(100);
+		}    
+}
+
+void Humidi_test(void)
+{
+		float Humidi = 0;
+		while(1)
+		{
+			Humidi = HDC1000_Read_Humidi()*100/65536.0;
+			LCD_ShowString(0,0,"Humidi:",BLACK);
+			LCD_ShowFloat(60,0,Humidi,2,3,BLACK);
+			LCD_Clear(WHITE);
+			if(Pen_Point.Key_Sta == 1)
+			{
+					Pen_Point.Key_Sta =0;
+				  float posx = Pen_Point.X*240.0/2048.0;
+					float posy = 360-Pen_Point.Y*360.0/2048.0;
+					if(posx>=170 && posx <=220 && posy>=280 && posy<=320)
+				 {
+					 MenuRender(1);
+					 return;
+				 }
+			}
+			HAL_Delay(100);
+		}    
 }
 
 void LORA_NODE_Test(void)
