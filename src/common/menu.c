@@ -3,10 +3,12 @@
 #include "menu.h"
 #include "stdio.h"
 #include "ST7789v.h"
+#include "XPT2046.h"
+#include "usart.h"
 
-
-uint32_t cntpage;            // ҳ��
-struct page *navigate[32]; // ָ��
+uint32_t cntpage;            //页数
+struct page *navigate[32]; //指针
+extern Pen_Holder Pen_Point;//定义笔实体
 
 enum
 {
@@ -20,10 +22,10 @@ enum
 } KEY_TYPE;
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��tg�������Ӳ˵�����
-//  @param      tg              ���Ӽ��ĵ�ַ
-//  @param      name            ���� �13λ
-//  @param          v                           ��ǰ������һ���˵���ַ
+//  @brief      在tg下添加子菜单类型
+//  @param      tg              添加级的地址
+//  @param      name            名称 最长13位
+//  @param          v                           当前添加下一级菜单地址
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -43,11 +45,11 @@ void add_subpage(struct page *tg, char *name, struct page *v)
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��tg������ֵ����
-//  @param      tg                                  ��һ���˵�
-//  @param      name                            ����
-//  @param          v                                           ��ֵ�Ĵ�С
-//  @param          changedCallBack             ����ָ�� ִ���޸ĸ�ֵ�ĺ���
+//  @brief      在tg下添加值类型
+//  @param      tg                                  这一级菜单
+//  @param      name                            名称
+//  @param          v                                           该值的大小
+//  @param          changedCallBack             函数指针 执行修改该值的函数
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -68,11 +70,11 @@ void add_value(struct page *tg, char *name, int *v, int16_t dt, void (*changedCa
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��tg������ֵ����
-//  @param      tg                                  ��һ���˵�
-//  @param      name                            ����
-//  @param          v                                           ��ֵ�Ĵ�С
-//  @param          changedCallBack             ����ָ�� ִ���޸ĸ�ֵ�ĺ���
+//  @brief      在tg下添加值类型
+//  @param      tg                                  这一级菜单
+//  @param      name                            名称
+//  @param          v                                           该值的大小
+//  @param          changedCallBack             函数指针 执行修改该值的函数
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -93,11 +95,11 @@ void add_value_uint8(struct page *tg, char *name, uint8_t *v, uint8_t dt, void (
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��tg������ֵ����
-//  @param      tg                                  ��һ���˵�
-//  @param      name                            ����
-//  @param          v                                           ��ֵ�Ĵ�С
-//  @param          changedCallBack             ����ָ�� ִ���޸ĸ�ֵ�ĺ���
+//  @brief      在tg下添加值类型
+//  @param      tg                                  这一级菜单
+//  @param      name                            名称
+//  @param          v                                           该值的大小
+//  @param          changedCallBack             函数指针 执行修改该值的函数
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -120,11 +122,11 @@ void add_title(struct page *tg, char *name, char length)
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��tg�����Ӹ���������
-//  @param      tg                                  ��һ���˵�
-//  @param      name                            ����
-//  @param          v                                           ��ֵ�Ĵ�С
-//  @param          changedCallBack             ����ָ�� ִ���޸ĸ�ֵ�ĺ���
+//  @brief      在tg下添加浮点数类型
+//  @param      tg                                  这一级菜单
+//  @param      name                            名称
+//  @param          v                                           该值的大小
+//  @param          changedCallBack             函数指针 执行修改该值的函数
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -145,11 +147,11 @@ void add_value_float(struct page *tg, char *name, float *v, float dt, void (*cha
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��tg������int32������
-//  @param      tg                                  ��һ���˵�
-//  @param      name                            ����
-//  @param          v                                           ��ֵ�Ĵ�С
-//  @param          changedCallBack             ����ָ�� ִ���޸ĸ�ֵ�ĺ���
+//  @brief      在tg下添加int32数类型
+//  @param      tg                                  这一级菜单
+//  @param      name                            名称
+//  @param          v                                           该值的大小
+//  @param          changedCallBack             函数指针 执行修改该值的函数
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -170,11 +172,11 @@ void add_value_int32(struct page *tg, char *name, int32_t *v, int32_t dt, void (
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��tg�����ӿ�������
-//  @param      tg                  ��һ���˵�
-//  @param      name            ����
-//  @param          v                           Ϊ1 0��ֵ 1Ϊon 0Ϊoff
-//  @param          operate             ִ�п��ز����ĺ���
+//  @brief      在tg下添加开关类型
+//  @param      tg                  这一级菜单
+//  @param      name            名称
+//  @param          v                           为1 0两值 1为on 0为off
+//  @param          operate             执行开关操作的函数
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -196,10 +198,10 @@ void add_switc(struct page *tg, char *name, int16_t *v, void (*operate)())
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��tg�����Ӻ�������
-//  @param      tg                  ��һ���˵�
-//  @param      name            ����
-//  @param          v                           ִ�иò�������������
+//  @brief      在tg下添加函数类型
+//  @param      tg                  这一级菜单
+//  @param      name            名称
+//  @param          v                           执行该操作函数的名称
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -219,7 +221,7 @@ void add_func(struct page *tg, char *name, void (*v)())
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��ʾ���
+//  @brief      显示光标
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -227,7 +229,7 @@ void add_func(struct page *tg, char *name, void (*v)())
 void LCD_BeginUpdate(void)
 {
   LCD_Clear(WHITE);
-  LCD_ShowString(0, navigate[cntpage]->pos - navigate[cntpage]->rpos, "-",BLACK);
+  LCD_ShowString(0, (navigate[cntpage]->pos - navigate[cntpage]->rpos)*16, "-",BLACK);
 }
 
 void LCD_EndUpdate(void)
@@ -235,8 +237,8 @@ void LCD_EndUpdate(void)
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ��ӡ��� �˵�ɨ��
-//  @param      full_update                 0 �� 1 ѡ��ȫ����ӡ����ֻˢ�±仯����
+//  @brief      打印输出 菜单扫描
+//  @param      full_update                 0 或 1 选择全部打印或者只刷新变化部分
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -248,10 +250,10 @@ void MenuRender(char full_update)
     LCD_BeginUpdate();
 
     int tmp = 0;
-    for (int i = navigate[cntpage]->rpos; i < navigate[cntpage]->rpos + 8 && i < navigate[cntpage]->count; i++)
+    for (int i = navigate[cntpage]->rpos; i < navigate[cntpage]->rpos + 19 && i < navigate[cntpage]->count; i++)
     {
 
-      LCD_ShowString(6, i - navigate[cntpage]->rpos, navigate[cntpage]->itemlist[i].name, BLACK);
+      LCD_ShowString(8, (i - navigate[cntpage]->rpos)*16, navigate[cntpage]->itemlist[i].name, BLACK);
 
       switch (navigate[cntpage]->itemlist[i].type)
       {
@@ -262,9 +264,9 @@ void MenuRender(char full_update)
       case switc:
         tmp = *((int16_t *)navigate[cntpage]->itemlist[i].addr);
         if (tmp)
-          LCD_ShowString(18 * 6, i - navigate[cntpage]->rpos, "On",BLACK);
+          LCD_ShowString(18 * 6, (i - navigate[cntpage]->rpos)*16, "On",BLACK);
         else
-          LCD_ShowString(18 * 6, i - navigate[cntpage]->rpos, "Off",BLACK);
+          LCD_ShowString(18 * 6, (i - navigate[cntpage]->rpos)*16, "Off",BLACK);
         break;
       case func:
         break;
@@ -273,26 +275,26 @@ void MenuRender(char full_update)
         if (!navigate[cntpage]->dymantic_page)
         {
           tmp = *((int16_t *)navigate[cntpage]->itemlist[i].addr);
-          LCD_ShowNum((uint8_t)14 * 6, (uint8_t)(i - navigate[cntpage]->rpos), (int16_t)tmp, 6,BLACK);
+          LCD_ShowNum((uint8_t)14 * 6, (uint8_t)(i - navigate[cntpage]->rpos)*16, (int16_t)tmp, 6,BLACK);
         }
         break;
       }
-      // case value_float:
-      // {
-      //   if (!navigate[cntpage]->dymantic_page)
-      //   {
-      //     float temp_float = (*((float *)navigate[cntpage]->itemlist[i].addr));
-      //     oled_show_float(14 * 6, i - navigate[cntpage]->rpos, temp_float, 2, 3);
-      //   }
-      //   break;
-      // }
+      case value_float:
+      {
+         if (!navigate[cntpage]->dymantic_page)
+         {
+           float temp_float = (*((float *)navigate[cntpage]->itemlist[i].addr));
+           LCD_ShowFloat(14 * 6, (i - navigate[cntpage]->rpos)*16, temp_float, 2, 3,BLACK);
+         }
+         break;
+      }
       default:
         break;
       }
     }
 
     if (!navigate[cntpage]->dymantic_page)
-      LCD_ShowString(0, navigate[cntpage]->pos - navigate[cntpage]->rpos, "-",BLACK);
+      LCD_ShowString(0, (navigate[cntpage]->pos - navigate[cntpage]->rpos)*16, "-",BLACK);
 
     LCD_EndUpdate();
   }
@@ -316,12 +318,12 @@ void MenuRender(char full_update)
           LCD_ShowNum(15 * 3, i - navigate[cntpage]->rpos, tmpv, 6,BLACK);
           break;
         }
-        // case value_float:
-        // {
-        //   float tmpv = *((float *)navigate[cntpage]->itemlist[i].addr);
-        //   oled_show_float(14 * 6, i - navigate[cntpage]->rpos, tmpv, 2, 3);
-        //   break;
-        // }
+         case value_float:
+         {
+           float tmpv = *((float *)navigate[cntpage]->itemlist[i].addr);
+           LCD_ShowFloat(14 * 6, (i - navigate[cntpage]->rpos)*16, tmpv, 2, 3,BLACK);
+           break;
+        }
         default:
           break;
         }
@@ -339,8 +341,8 @@ void MenuInit(struct page *mainpage)
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ִ�а�������
-//  @param      cmd                                     �������� 0 Ϊ�޲���
+//  @brief      执行按键操作
+//  @param      cmd                                     按键功能 0 为无操作
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
@@ -502,145 +504,61 @@ void MenuCmd(char cmd)
     MenuRender(0);
 }
 
-// uint8_t key_scan(void)
-// {
-//   if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_0) == GPIO_PIN_RESET)
-//   {
-//     HAL_Delay(KEY_DelayTime);
-//     if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_0) == GPIO_PIN_RESET)
-//     {
-//       printf("KEY_ENTER\n");
-//       return KEY_ENTER;
-//     }
-//   }
-
-//   if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_1) == GPIO_PIN_RESET)
-//   {
-//     HAL_Delay(KEY_DelayTime);
-//     if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_1) == GPIO_PIN_RESET)
-//     {
-//       printf("KEY_ADD\n");
-//       return KEY_ADD;
-//     }
-//   }
-
-//   if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_2) == GPIO_PIN_RESET)
-//   {
-//     HAL_Delay(KEY_DelayTime);
-//     if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_2) == GPIO_PIN_RESET)
-//     {
-//       printf("KEY_LEAVE\n");
-//       return KEY_LEAVE;
-//     }
-//   }
-
-//   if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_3) == GPIO_PIN_RESET)
-//   {
-//     HAL_Delay(KEY_DelayTime);
-//     if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_3) == GPIO_PIN_RESET)
-//     {
-//       printf("KEY_UP\n");
-//       return KEY_UP;
-//     }
-//   }
-
-//   if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_5) == GPIO_PIN_RESET)
-//   {
-//     HAL_Delay(KEY_DelayTime);
-//     if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_5) == GPIO_PIN_RESET)
-//     {
-//       printf("KEY_LEAVE\n");
-//       return KEY_LEAVE;
-//     }
-//   }
-
-//   if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == GPIO_PIN_RESET)
-//   {
-//     HAL_Delay(KEY_DelayTime);
-//     if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == GPIO_PIN_RESET)
-//     {
-//       printf("KEY_DOWN\n");
-//       return KEY_DOWN;
-//     }
-//   }
-
-//   if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == GPIO_PIN_RESET)
-//   {
-//     HAL_Delay(KEY_DelayTime);
-//     if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == GPIO_PIN_RESET)
-//     {
-//       printf("KEY_SUB\n");
-//       return KEY_SUB;
-//     }
-//   }
-//   return 0;
-// }
 //-------------------------------------------------------------------------------------------------------------------
-//  @brief      ����ɨ��
+//  @brief      key_scan();右上角数值是2048，2048，左下角0，0
 //  @param      void
 //  @return     void
 //  @since      v1.0
 //  Sample usage:
 //-------------------------------------------------------------------------------------------------------------------
-uint32_t ADCY = 0;
-uint32_t ADCX = 0;
-
-// void ADC_Get_Value(void)
-// {
-//   for(uint8_t i=0;i<4;i++)
-//   {
-//     HAL_ADC_Start(&hadc1);
-//     HAL_ADC_PollForConversion(&hadc1, 20);
-//     switch(i)
-//     {
-//       case 0: ADCY = HAL_ADC_GetValue(&hadc1);break;
-//       case 1: ADCX = HAL_ADC_GetValue(&hadc1);break;
-//       case 2: current = HAL_ADC_GetValue(&hadc1);break;
-//       case 3: voltage = HAL_ADC_GetValue(&hadc1);break;
-//     }
-//   }
-//   printf("ADCY:%d,ADCX:%d\n",ADCY,ADCX);
-//   printf("current:%d,voltage:%d\n",current,voltage);
-// }
+uint32_t posx = 0;
+uint32_t posy = 0;
 
 uint8_t key_scan(void) 
 {
+	if(Pen_Point.Key_Sta == 1)
+	{
+		 Pen_Point.Key_Sta = 0;
+     posx = Pen_Point.X*240.0/2048.0;
+     posy = 360-Pen_Point.Y*360.0/2048.0;
+		 debug_printf("\r\n[posx:%u,posy:%u]\r\n",posx,posy);
+		 if(posx>=100 && posx <=140 && posy>=200 && posy<=240)
+		 {
+			 return KEY_UP;
+		 }
+		 if(posx>=100 && posx <=140 && posy>=270 && posy<=310)
+		 {
+			 return KEY_DOWN;
+		 }
+	}
   // ADC_Get_Value();
-  if (ADCY > MAX_ADC_VAL) {
-      HAL_Delay(100);
-      if (ADCY > MAX_ADC_VAL) {
-          printf("KEY_LEAVE;\n");
-          return KEY_LEAVE;
-      }
-  }
-  if (ADCY < MIN_ADC_BAL) {
-      HAL_Delay(KEY_DelayTime);
-      if (ADCY < MIN_ADC_BAL) {
-
-          printf("KEY_UP;\n");
-          return KEY_UP;
-      }
-  }
-  if (ADCX > MAX_ADC_VAL) {
-      HAL_Delay(KEY_DelayTime);
-      if (ADCX > MAX_ADC_VAL) {
-          printf("KEY_SUB;\n");
-          return KEY_SUB;
-      }
-  }
-  if (ADCX < MIN_ADC_BAL) {
-      HAL_Delay(KEY_DelayTime);
-      if (ADCX < MIN_ADC_BAL) {
-          printf("KEY_ADD;\n");
-          return KEY_ADD;
-      }
-  }
-  if (HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2) == 0) {
-      HAL_Delay(KEY_DelayTime);
-      if ((HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2) == 0)) {
-          printf("KEY_ENTER;\n");
-          return KEY_ENTER;
-      }
-  }
-  return 0;
+//  if (ADCY > MAX_ADC_VAL) {
+//      HAL_Delay(100);
+//      if (ADCY > MAX_ADC_VAL) {
+//          printf("KEY_LEAVE;\n");
+//          return KEY_LEAVE;
+//      }
+//  }
+//  if (ADCX > MAX_ADC_VAL) {
+//      HAL_Delay(KEY_DelayTime);
+//      if (ADCX > MAX_ADC_VAL) {
+//          printf("KEY_SUB;\n");
+//          return KEY_SUB;
+//      }
+//  }
+//  if (ADCX < MIN_ADC_BAL) {
+//      HAL_Delay(KEY_DelayTime);
+//      if (ADCX < MIN_ADC_BAL) {
+//          printf("KEY_ADD;\n");
+//          return KEY_ADD;
+//      }
+//  }
+//  if (HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2) == 0) {
+//      HAL_Delay(KEY_DelayTime);
+//      if ((HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_2) == 0)) {
+//          printf("KEY_ENTER;\n");
+//          return KEY_ENTER;
+//      }
+//  }
+//  return 0;
 }

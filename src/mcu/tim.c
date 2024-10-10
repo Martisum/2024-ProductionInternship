@@ -215,14 +215,11 @@ void MX_TIM15_Init(uint32_t pwm_puty)
 void TIM7_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM7_IRQn 0 */
-    static uint8_t tmp_cnt = 0;
+    
   /* USER CODE END TIM7_IRQn 0 */
   HAL_TIM_IRQHandler(&htim7);
   /* USER CODE BEGIN TIM7_IRQn 1 */
-    // LCD_ShowString(0,30,"wzh:",BLACK);
-//    LCD_ShowString(0,0,"wzh:",BLACK);
-//    tmp_cnt++;
-   LCD_ShowNum(50,0,tmp_cnt,5,BLACK);
+
   /* USER CODE END TIM7_IRQn 1 */
 }
 

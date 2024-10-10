@@ -1,11 +1,10 @@
 #ifndef __MENU_H
 #define __MENU_H
-#include "main.h"
+#include "stm32l4xx.h"
 
 #define MAX_ADC_VAL 4000
 #define MIN_ADC_BAL 100
-extern uint32_t ADCY;
-extern uint32_t ADCX;
+
 struct item                                     
 {
     enum

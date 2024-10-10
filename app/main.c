@@ -42,8 +42,10 @@
 #include "mma8451.h"
 #include "ST7789v.h"
 #include "XPT2046.h"
+#include "menu.h"
 /* USER CODE BEGIN 0 */
-
+struct  page p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10;
+void  menu_init (void);
 /* USER CODE END 0 */
 
 /**
@@ -87,7 +89,7 @@ int main(void)
 
     /** 液晶 */
     LCD_Init();
-
+		menu_init();//菜单
     /** 复位模块 */
     HAL_Delay(500);              //模块上电初始化时间
     Node_Hard_Reset();
@@ -99,8 +101,33 @@ int main(void)
     /* USER CODE BEGIN WHILE  */
     while (1)
     {
-        LoRaWAN_Func_Process();
+				MenuCmd(key_scan());
+        if (navigate[cntpage]->dymantic_page)//如果为动态页
+        {
+            MenuRender(0);
+            HAL_Delay(100);
+        }
+				key_show();
+//        LoRaWAN_Func_Process();
     }
+}
+
+int weak_down=100;
+float hl_Kp = 10.9;
+void  menu_init ()
+{
+			//P0
+			{
+					add_subpage     (&p0, "function",   		&p1);
+					add_subpage     (&p0, "round_island",   &p2);
+					add_subpage     (&p0, "Speed",      		&p3);
+					add_subpage     (&p0, "open_loop",  		&p4);
+					add_subpage     (&p0, "differ_pid",  		&p5);
+					add_subpage     (&p0, "none",      			&p6);
+					add_value      (&p0, "*weak_down*",&weak_down,10,NULL);
+					add_value_float(&p0, "*hl_Kp*", &hl_Kp, 0.1, NULL);
+			}
+			MenuInit           (&p0);
 }
 
 /**

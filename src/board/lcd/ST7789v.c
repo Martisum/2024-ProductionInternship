@@ -1,6 +1,7 @@
 #include "ST7789v.h"
 #include "XPT2046.h"
 #include "tim.h"
+#include "string.h"
 
 extern uint8_t LCD_EN;
 
@@ -901,4 +902,140 @@ void LCD_ST7789_DrawPicture(uint16_t StartX,uint16_t StartY,uint16_t Xend,uint16
     }
 
 }
+//-------------------------------------------------------------------------------------------------------------------
+// 函数简介     浮点数字转字符串
+// 参数说明     *str            字符串指针
+// 参数说明     number          传入的数据
+// 参数说明     point_bit       小数点精度
+// 返回参数     void
+// 使用示例     func_double_to_str(data_buffer, 3.1415, 2);                     // 结果输出 data_buffer = "3.14"
+// 备注信息     
+//-------------------------------------------------------------------------------------------------------------------
+void func_double_to_str (char *str, double number, uint8_t point_bit)
+{
+    int data_int = 0;                                                           // 整数部分
+    int data_float = 0.0;                                                       // 小数部分
+    int data_temp[12];                                                          // 整数字符缓冲
+    int data_temp_point[9];                                                     // 小数字符缓冲
+    uint8_t bit = point_bit;                                                      // 转换精度位数
 
+    do
+    {
+        if(NULL == str)
+        {
+            break;
+        }
+
+        // 提取整数部分
+        data_int = (int)number;                                                 // 直接强制转换为 int
+        if(0 > number)                                                          // 判断源数据是正数还是负数
+        {
+            *str ++ = '-';
+        }
+        else if(0.0 == number)                                                  // 如果是个 0
+        {
+            *str ++ = '0';
+            *str ++ = '.';
+            *str = '0';
+            break;
+        }
+
+        // 提取小数部分
+        number = number - data_int;                                             // 减去整数部分即可
+        while(bit --)
+        {
+            number = number * 10;                                               // 将需要的小数位数提取到整数部分
+        }
+        data_float = (int)number;                                               // 获取这部分数值
+
+        // 整数部分转为字符串
+        bit = 0;
+        do
+        {
+            data_temp[bit ++] = data_int % 10;                                  // 将整数部分倒序写入字符缓冲区
+            data_int /= 10;
+        }while(0 != data_int);
+        while(0 != bit)
+        {
+            *str ++ = (func_abs(data_temp[bit - 1]) + 0x30);                    // 再倒序将倒序的数值写入字符串 得到正序数值
+            bit --;
+        }
+
+        // 小数部分转为字符串
+        if(point_bit != 0)
+        {
+            bit = 0;
+            *str ++ = '.';
+            if(0 == data_float)
+                *str = '0';
+            else
+            {
+                while(0 != point_bit)                                           // 判断有效位数
+                {
+                    data_temp_point[bit ++] = data_float % 10;                  // 倒序写入字符缓冲区
+                    data_float /= 10;
+                    point_bit --;                                                
+                }
+                while(0 != bit)
+                {
+                    *str ++ = (func_abs(data_temp_point[bit - 1]) + 0x30);      // 再倒序将倒序的数值写入字符串 得到正序数值
+                    bit --;
+                }
+            }
+        }
+    }while(0);
+}
+//-------------------------------------------------------------------------------------------------------------------
+// 函数简介     OLED 显示浮点数 (去除整数部分无效的0)
+// 参数说明     x               x 轴坐标设置 0-239
+// 参数说明     y               y 轴坐标设置 0-19
+// 参数说明     dat             需要显示的变量 数据类型 float
+// 参数说明     num             整数位显示长度   最高8位
+// 参数说明     pointnum        小数位显示长度   最高6位
+// 返回参数     void
+// 使用示例     oled_show_float(0, 0, x, 2, 3,BLACK);                 // 显示浮点数   整数显示2位   小数显示三位
+// 备注信息     特别注意当发现小数部分显示的值与你写入的值不一样的时候，
+//              可能是由于浮点数精度丢失问题导致的，这并不是显示函数的问题，
+//              有关问题的详情，请自行百度学习   浮点数精度丢失问题。
+//              负数会显示一个 ‘-’号
+//-------------------------------------------------------------------------------------------------------------------
+void LCD_ShowFloat (uint16_t x,uint16_t y,const double dat,uint8_t num,uint8_t pointnum,uint16_t color)
+{
+    double dat_temp = dat;
+    double offset = 1.0;
+    char data_buffer[17];
+    memset(data_buffer, 0, 17);
+    memset(data_buffer, ' ', num + pointnum + 2);
+
+    // 用来计算余数显示 123 显示 2 位则应该显示 23
+    for(; 0 < num; num --)
+    {
+        offset *= 10;
+    }
+    dat_temp = dat_temp - ((int)dat_temp / (int)offset) * offset;
+    func_double_to_str(data_buffer, dat_temp, pointnum);
+    LCD_ShowString(x, y, data_buffer,color);
+}
+//-------------------------------------------------------------------------------------------------------------------
+// 函数简介     按键显示
+// 参数说明     x               x 轴坐标设置 0-239
+// 参数说明     y               y 轴坐标设置 0-19
+// 参数说明     dat             需要显示的变量 数据类型 float
+// 参数说明     num             整数位显示长度   最高8位
+// 参数说明     pointnum        小数位显示长度   最高6位
+// 返回参数     void
+//-------------------------------------------------------------------------------------------------------------------
+void key_show(void)
+{
+	//上移按键显示
+	LCD_DrawRectangle(100,200,140,240,BLACK);
+	LCD_DrawLine(120,205,120,235,BLACK);
+	LCD_DrawLine(120,205,110,220,BLACK);
+	LCD_DrawLine(120,205,130,220,BLACK);
+	//下移按键显示
+	LCD_DrawRectangle(100,270,140,310,BLACK);
+	LCD_DrawLine(120,275,120,305,BLACK);
+	LCD_DrawLine(120,305,110,290,BLACK);
+	LCD_DrawLine(120,305,130,290,BLACK);
+	//进入按键显示
+}
