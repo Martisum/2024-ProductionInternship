@@ -108,7 +108,7 @@ int main(void)
             MenuRender(0);
             HAL_Delay(100);
         }
-				key_show();
+				key_show(1);
 //        LoRaWAN_Func_Process();
     }
 }
@@ -125,10 +125,11 @@ void  menu_init ()
 //					add_value_float(&p0, "*hl_Kp*", &hl_Kp, 0.1, NULL);
 			}
 			{
+					add_func        (&p1, "<FULL-test>",FULL_test);
 					add_func        (&p1, "<temper-test>", temper_test);
 					add_func        (&p1, "<Humidi-test>",Humidi_test);
-//					add_func        (&p1, "<lux-test>",lux_test);
-//					add_func        (&p1, "<pressure-test>",pressure_test);
+					add_func        (&p1, "<lux-test>",lux_test);
+					add_func        (&p1, "<pressure-test>",pressure_test);
 			}
 			MenuInit           (&p0);
 }

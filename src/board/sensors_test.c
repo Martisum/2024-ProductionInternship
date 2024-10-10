@@ -130,12 +130,13 @@ void MMA8451_Test(void)
 void temper_test(void)
 {
 		float temper = 0;
+		LCD_Clear(WHITE);
 		while(1)
-		{
+		{		
+			LCD_Cleardata(70,240,0,20);
 			temper = HDC1000_Read_Temper()*165.0/65536.0-40.0;
-			LCD_ShowString(0,0,"temper:",BLACK);
-			LCD_ShowFloat(60,0,temper,2,3,BLACK);
-			LCD_Clear(WHITE);
+			LCD_ShowString(10,0,"temper:",BLACK);
+			LCD_ShowFloat(70,0,temper,2,3,BLACK);	
 			if(Pen_Point.Key_Sta == 1)
 			{
 					Pen_Point.Key_Sta =0;
@@ -147,19 +148,21 @@ void temper_test(void)
 					 return;
 				 }
 			}
-			HAL_Delay(100);
+			key_show(0);
+			HAL_Delay(500);
 		}    
 }
 
 void Humidi_test(void)
 {
 		float Humidi = 0;
+		LCD_Clear(WHITE);
 		while(1)
-		{
+		{	
+			LCD_Cleardata(70,240,0,20);
 			Humidi = HDC1000_Read_Humidi()*100/65536.0;
-			LCD_ShowString(0,0,"Humidi:",BLACK);
-			LCD_ShowFloat(60,0,Humidi,2,3,BLACK);
-			LCD_Clear(WHITE);
+			LCD_ShowString(10,0,"Humidi:",BLACK);
+			LCD_ShowFloat(70,0,Humidi,2,3,BLACK);	
 			if(Pen_Point.Key_Sta == 1)
 			{
 					Pen_Point.Key_Sta =0;
@@ -171,8 +174,102 @@ void Humidi_test(void)
 					 return;
 				 }
 			}
-			HAL_Delay(100);
+			key_show(0);
+			HAL_Delay(500);
 		}    
+}
+void lux_test(void)
+{
+		float lux = 0;
+		LCD_Clear(WHITE);
+		while(1)
+		{	
+			LCD_Cleardata(42,240,0,20);
+			uint16_t result;
+			result = OPT3001_Result();
+			lux = 0.01*(1 << ((result & 0xF000) >> 12))*(result & 0xFFF);
+			LCD_ShowString(10,0,"lux:",BLACK);
+			LCD_ShowFloat(42,0,lux,4,3,BLACK);	
+			if(Pen_Point.Key_Sta == 1)
+			{
+					Pen_Point.Key_Sta =0;
+				  float posx = Pen_Point.X*240.0/2048.0;
+					float posy = 360-Pen_Point.Y*360.0/2048.0;
+					if(posx>=170 && posx <=220 && posy>=280 && posy<=320)
+				 {
+					 MenuRender(1);
+					 return;
+				 }
+			}
+			key_show(0);
+			HAL_Delay(500);
+		}    
+}
+void pressure_test(void)
+{
+		float pressure = 0; 
+		LCD_Clear(WHITE);
+		while(1)
+		{	
+			LCD_Cleardata(82,240,0,24);
+			pressure = MPL3115_ReadPressure();
+			LCD_ShowString(10,0,"pressure:",BLACK);
+			LCD_ShowFloat(82,0,pressure,5,1,BLACK);	
+			if(Pen_Point.Key_Sta == 1)
+			{
+					Pen_Point.Key_Sta =0;
+				  float posx = Pen_Point.X*240.0/2048.0;
+					float posy = 360-Pen_Point.Y*360.0/2048.0;
+					if(posx>=170 && posx <=220 && posy>=280 && posy<=320)
+				 {
+					 MenuRender(1);
+					 return;
+				 }
+			}
+			key_show(0);
+			HAL_Delay(500);
+		}    
+}
+void FULL_test(void)
+{
+		float temper = 0;
+		float Humidi = 0;
+		float lux = 0;
+		float pressure = 0; 
+		LCD_Clear(WHITE);
+		while(1)
+		{
+			LCD_Cleardata(40,240,0,80);
+			temper = HDC1000_Read_Temper()*165.0/65536.0-40.0;
+			Humidi = HDC1000_Read_Humidi()*100/65536.0;
+			uint16_t result;
+			result = OPT3001_Result();
+			lux = 0.01*(1 << ((result & 0xF000) >> 12))*(result & 0xFFF);
+			pressure = MPL3115_ReadPressure();
+			LCD_ShowString(10,0,"temper:",BLACK);
+			LCD_ShowFloat(70,0,temper,2,3,BLACK);	
+			LCD_ShowString(120,0,"C",BLACK);
+			LCD_ShowString(10,16,"Humidi:",BLACK);
+			LCD_ShowFloat(70,16,Humidi,2,3,BLACK);
+			LCD_ShowString(120,16,"%",BLACK);			
+			LCD_ShowString(10,32,"lux:",BLACK);
+			LCD_ShowFloat(42,32,lux,4,3,BLACK);	
+			LCD_ShowString(10,48,"pressure:",BLACK);
+			LCD_ShowFloat(82,48,pressure,5,1,BLACK);	
+			if(Pen_Point.Key_Sta == 1)
+			{
+					Pen_Point.Key_Sta =0;
+				  float posx = Pen_Point.X*240.0/2048.0;
+					float posy = 360-Pen_Point.Y*360.0/2048.0;
+					if(posx>=170 && posx <=220 && posy>=280 && posy<=320)
+				 {
+					 MenuRender(1);
+					 return;
+				 }
+			}
+			key_show(0);
+			HAL_Delay(250);
+		}
 }
 
 void LORA_NODE_Test(void)

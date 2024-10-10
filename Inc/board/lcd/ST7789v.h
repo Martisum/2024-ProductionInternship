@@ -117,6 +117,7 @@ void LCD_Test(void);
 void LCD_Init(void);
 void func_double_to_str (char *str, double number, uint8_t point_bit);
 void LCD_ShowFloat (uint16_t x,uint16_t y,const double dat,uint8_t num,uint8_t pointnum,uint16_t color);
-void key_show(void);
+void key_show(uint8_t state);
+void LCD_Cleardata(uint16_t x0,uint16_t x,uint16_t y0,uint16_t y);
 
 #endif
