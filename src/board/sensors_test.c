@@ -247,6 +247,17 @@ void FULL_test(void)
 			result = OPT3001_Result();
 			lux = 0.01*(1 << ((result & 0xF000) >> 12))*(result & 0xFFF);
 			pressure = MPL3115_ReadPressure();
+			// LCD_ShowString(10,0,"temper:",BLACK);
+			// LCD_ShowFloat(70,0,temper,2,3,BLACK);	
+			// LCD_ShowString(120,0,"C",BLACK);
+			// LCD_ShowString(10,16,"Humidi:",BLACK);
+			// LCD_ShowFloat(70,16,Humidi,2,3,BLACK);
+			// LCD_ShowString(120,16,"%",BLACK);			
+			// LCD_ShowString(10,32,"lux:",BLACK);
+			// LCD_ShowFloat(42,32,lux,4,3,BLACK);	
+			// LCD_ShowString(10,48,"pressure:",BLACK);
+			// LCD_ShowFloat(82,48,pressure,5,1,BLACK);
+
 			LCD_ShowString(10,0,"temper:",BLACK);
 			LCD_ShowFloat(70,0,temper,2,3,BLACK);	
 			LCD_ShowString(120,0,"C",BLACK);
@@ -257,22 +268,26 @@ void FULL_test(void)
 			LCD_ShowFloat(42,32,lux,4,3,BLACK);	
 			LCD_ShowString(10,48,"pressure:",BLACK);
 			LCD_ShowFloat(82,48,pressure,5,1,BLACK);
+
+			HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET);
 			
 
-			if(temper>40){
-				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
-				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_SET);
-			}
-			else if(temper<30){
-				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET);
-			}
+			// if(temper>40){
+			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
+			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_SET);
+			// }
+			// else if(temper<30){
+			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
+			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET);
+			// }
 
-			if(Humidi>90){
-				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
-			}else if(Humidi<80){
-				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
-			}
+			// if(Humidi>90){
+			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+			// }else if(Humidi<80){
+			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
+			// }
 			
 			if(Pen_Point.Key_Sta == 1)
 			{
