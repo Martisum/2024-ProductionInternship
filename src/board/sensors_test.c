@@ -10,6 +10,7 @@
 
 extern Pen_Holder Pen_Point;//定义笔实体
 int8_t Error_num = 0;
+uint8_t mark_depression=0,mark_high_humi=0,mark_sud_temp_drop=0,mark_rainy=0;
 
 void Test_task(void)
 {
@@ -255,7 +256,24 @@ void FULL_test(void)
 			LCD_ShowString(10,32,"lux:",BLACK);
 			LCD_ShowFloat(42,32,lux,4,3,BLACK);	
 			LCD_ShowString(10,48,"pressure:",BLACK);
-			LCD_ShowFloat(82,48,pressure,5,1,BLACK);	
+			LCD_ShowFloat(82,48,pressure,5,1,BLACK);
+			
+
+			if(temper>40){
+				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_SET);
+			}
+			else if(temper<30){
+				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET);
+			}
+
+			if(Humidi>90){
+				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
+			}else if(Humidi<80){
+				HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
+			}
+			
 			if(Pen_Point.Key_Sta == 1)
 			{
 					Pen_Point.Key_Sta =0;

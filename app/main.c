@@ -90,7 +90,7 @@ int main(void)
 
     /** 液晶 */
     LCD_Init();
-		menu_init();//菜单
+    menu_init();//菜单
     /** 复位模块 */
     HAL_Delay(500);              //模块上电初始化时间
     Node_Hard_Reset();
@@ -117,21 +117,21 @@ int weak_down=100;
 float hl_Kp = 10.9;
 void  menu_init ()
 {
-			//P0
-			{
-					add_subpage     (&p0, "function",   		&p1);
-					add_subpage     (&p0, "parameter",   		&p2);
+    //P0
+    {
+            add_subpage     (&p0, "function",   		&p1);
+            add_subpage     (&p0, "parameter",   		&p2);
 //					add_value      (&p0, "*weak_down*",&weak_down,10,NULL);
 //					add_value_float(&p0, "*hl_Kp*", &hl_Kp, 0.1, NULL);
-			}
-			{
-					add_func        (&p1, "<FULL-test>",FULL_test);
-					add_func        (&p1, "<temper-test>", temper_test);
-					add_func        (&p1, "<Humidi-test>",Humidi_test);
-					add_func        (&p1, "<lux-test>",lux_test);
-					add_func        (&p1, "<pressure-test>",pressure_test);
-			}
-			MenuInit           (&p0);
+    }
+    {
+            add_func        (&p1, "<FULL-test>",FULL_test);
+            add_func        (&p1, "<temper-test>", temper_test);
+            add_func        (&p1, "<Humidi-test>",Humidi_test);
+            add_func        (&p1, "<lux-test>",lux_test);
+            add_func        (&p1, "<pressure-test>",pressure_test);
+    }
+    MenuInit           (&p0);
 }
 
 /**
