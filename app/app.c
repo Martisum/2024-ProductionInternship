@@ -133,18 +133,6 @@ void LoRaWAN_Func_Process(void)
             HAL_Delay(100);
         }
         key_show(1);
-        // HAL_TIM_Base_Start_IT(&htim7);
-
-//        LCD_Clear(WHITE);
-        // float temp = HDC1000_Read_Temper()*165.0/65536.0-40.0;
-        // float Humi = HDC1000_Read_Humidi()*100/65536.0;
-        // LCD_ShowString(0,0,"tempe:",BLACK);
-        // LCD_ShowFloat(50,0,temp,2,3,BLACK);
-        // debug_printf("\r\n[tempe:%.3f]\r\n",temp);//temp*(165.0/65536.0)-40
-        // debug_printf("\r\n[Humi:%.3f]\r\n",Humi);	//Humi		
-        // LCD_ShowNum(50,0,temp,5,BLACK);
-        // delay_10ms(10);
-
     }
     break;
 
@@ -171,6 +159,7 @@ void data_capture(void){
     day_info[GetTime.Hours].humidi=rt_humidi;
     day_info[GetTime.Hours].lux=rt_lux;
     day_info[GetTime.Hours].pressure=rt_pressure;
+			
 }
 
 void offline_control(void){

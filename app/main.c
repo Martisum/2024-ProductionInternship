@@ -115,16 +115,13 @@ int main(void)
     }
 }
 //≤‚ ‘”√
-int weak_down=100;
-float hl_Kp = 10.9;
 void  menu_init ()
 {
     //P0
     {
             add_subpage     (&p0, "function",   		&p1);
             add_subpage     (&p0, "parameter",   		&p2);
-//					add_value      (&p0, "*weak_down*",&weak_down,10,NULL);
-//					add_value_float(&p0, "*hl_Kp*", &hl_Kp, 0.1, NULL);
+
     }
     {
             add_func        (&p1, "<FULL-test>",FULL_test);
@@ -135,11 +132,11 @@ void  menu_init ()
     }
     {
         
-            add_value       (&p2, "<isUpload>",&isUpload,1,NULL);
-            add_value_float (&p2, "<HUMI_MAX>",&HUMI_MAX,0.5,NULL);
-            add_value_float (&p2, "<HUMI_MIN>",&HUMI_MIN,0.5,NULL);
-            add_value_float (&p2, "<TEMP_MAX>",&TEMP_MAX,0.5,NULL);
-            add_value_float (&p2, "<TEMP_MIN>",&TEMP_MIN,0.5,NULL);
+            add_value       (&p2, "<isUpload> ",&isUpload,1,NULL);
+            add_value_float (&p2, "<HUMI_MAX> ",&HUMI_MAX,0.5,NULL);
+            add_value_float (&p2, "<HUMI_MIN> ",&HUMI_MIN,0.5,NULL);
+            add_value_float (&p2, "<TEMP_MAX> ",&TEMP_MAX,0.5,NULL);
+            add_value_float (&p2, "<TEMP_MIN> ",&TEMP_MIN,0.5,NULL);
     }
     MenuInit           (&p0);
 }
