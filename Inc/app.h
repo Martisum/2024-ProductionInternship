@@ -3,7 +3,7 @@
 #include "stdint.h"
 
 
-
+extern float HUMI_MAX,HUMI_MIN,TEMP_MAX,TEMP_MIN;
 
 /* 软件版本，升级时修改该信息即可 */
 #define CODE_VERSION "V1.0.3"

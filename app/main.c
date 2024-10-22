@@ -65,7 +65,7 @@ int main(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_RTC_Init();
-    MX_TIM7_Init();
+    // MX_TIM7_Init();
 
     /** 串口初始化 */
     MX_LPUART1_Init(9600);  //MCU与模块相连串口
@@ -102,14 +102,7 @@ int main(void)
     /* USER CODE BEGIN WHILE  */
     while (1)
     {
-				MenuCmd(key_scan());
-        if (navigate[cntpage]->dymantic_page)//如果为动态页
-        {
-            MenuRender(0);
-            HAL_Delay(100);
-        }
-				key_show(1);
-//        LoRaWAN_Func_Process();
+       LoRaWAN_Func_Process();
     }
 }
 //测试用
@@ -130,6 +123,12 @@ void  menu_init ()
             add_func        (&p1, "<Humidi-test>",Humidi_test);
             add_func        (&p1, "<lux-test>",lux_test);
             add_func        (&p1, "<pressure-test>",pressure_test);
+    }
+    {
+            add_value_float (&p2, "<HUMI_MAX>",&HUMI_MAX,0.5,NULL);
+            add_value_float (&p2, "<HUMI_MIN>",&HUMI_MIN,0.5,NULL);
+            add_value_float (&p2, "<TEMP_MAX>",&TEMP_MAX,0.5,NULL);
+            add_value_float (&p2, "<TEMP_MIN>",&TEMP_MIN,0.5,NULL);
     }
     MenuInit           (&p0);
 }

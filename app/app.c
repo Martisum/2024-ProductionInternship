@@ -6,12 +6,18 @@
 #include "hdc1000.h"
 #include "sensors_test.h"
 #include "ST7789v.h"
+#include "menu.h"
 
 
 extern TIM_HandleTypeDef htim7;
 extern DEVICE_MODE_T device_mode;
 extern DEVICE_MODE_T *Device_Mode_str;
 down_list_t *pphead = NULL;
+
+float HUMI_MAX=90,HUMI_MIN=80,TEMP_MAX=37,TEMP_MIN=30;
+float rt_temp,rt_humidi,rt_lux,rt_pressure; //存储实时温度和湿度
+void offline_control(void);
+void data_capture(void);
 
 //-----------------Users application--------------------------
 void LoRaWAN_Func_Process(void)
@@ -104,24 +110,74 @@ void LoRaWAN_Func_Process(void)
         }
 				
         /* 你的实验代码位置 */
+        static uint8_t cycle_cnt=0;
+        cycle_cnt++;
+        if(cycle_cnt % 50 == 0){
+            data_capture(); //传感器数据采集
+        }
+        
+        offline_control(); //离线温湿度控制
 
-        HAL_TIM_Base_Start_IT(&htim7);
+        MenuCmd(key_scan());
+        if (navigate[cntpage]->dymantic_page)//如果为动态页
+        {
+            MenuRender(0);
+            HAL_Delay(100);
+        }
+        key_show(1);
+        // HAL_TIM_Base_Start_IT(&htim7);
 
 //        LCD_Clear(WHITE);
-        float temp = HDC1000_Read_Temper()*165.0/65536.0-40.0;
-				float Humi = HDC1000_Read_Humidi()*100/65536.0;
-        LCD_ShowString(0,0,"tempe:",BLACK);
-				LCD_ShowFloat(50,0,temp,2,3,BLACK);
-        debug_printf("\r\n[tempe:%.3f]\r\n",temp);//temp*(165.0/65536.0)-40
-				debug_printf("\r\n[Humi:%.3f]\r\n",Humi);	//Humi		
+        // float temp = HDC1000_Read_Temper()*165.0/65536.0-40.0;
+        // float Humi = HDC1000_Read_Humidi()*100/65536.0;
+        // LCD_ShowString(0,0,"tempe:",BLACK);
+        // LCD_ShowFloat(50,0,temp,2,3,BLACK);
+        // debug_printf("\r\n[tempe:%.3f]\r\n",temp);//temp*(165.0/65536.0)-40
+        // debug_printf("\r\n[Humi:%.3f]\r\n",Humi);	//Humi		
         // LCD_ShowNum(50,0,temp,5,BLACK);
-        delay_10ms(10);
+        // delay_10ms(10);
 
     }
     break;
 
     default:
         break;
+    }
+}
+
+void data_capture(void){
+    rt_temp = HDC1000_Read_Temper()*165.0/65536.0-40.0;
+    rt_humidi = HDC1000_Read_Humidi()*100/65536.0;
+    uint16_t result;
+    result = OPT3001_Result();
+    rt_lux = 0.01*(1 << ((result & 0xF000) >> 12))*(result & 0xFFF);
+    rt_pressure = MPL3115_ReadPressure();
+}
+
+void offline_control(void){
+    if(rt_temp<TEMP_MIN){
+        //开启加热器关闭风扇，reset是关闭
+        HAL_GPIO_WritePin(LedGpio_D6, LedPin_D6, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LedGpio_D7, LedPin_D7, GPIO_PIN_RESET);
+    }else if(rt_temp>TEMP_MAX){
+        HAL_GPIO_WritePin(LedGpio_D6, LedPin_D6, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LedGpio_D7, LedPin_D7, GPIO_PIN_SET);
+    }else{
+        //居中的话全部都关闭，由环境决定，节能省电
+        HAL_GPIO_WritePin(LedGpio_D6, LedPin_D6, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LedGpio_D7, LedPin_D7, GPIO_PIN_RESET);
+    }
+
+    if(rt_humidi<HUMI_MIN){
+        //开启喷雾关闭风扇
+        HAL_GPIO_WritePin(LedGpio_D8, LedPin_D8, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LedGpio_D7, LedPin_D7, GPIO_PIN_RESET);
+    }else if(rt_humidi>HUMI_MAX){
+        HAL_GPIO_WritePin(LedGpio_D8, LedPin_D8, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LedGpio_D7, LedPin_D7, GPIO_PIN_SET);
+    }else{
+        HAL_GPIO_WritePin(LedGpio_D8, LedPin_D8, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LedGpio_D7, LedPin_D7, GPIO_PIN_RESET);
     }
 }
 

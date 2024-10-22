@@ -64,19 +64,19 @@ void MX_GPIO_Init(void)
     __HAL_RCC_GPIOE_CLK_ENABLE();
     __HAL_RCC_LPUART1_CLK_ENABLE();
     //-----------------------------LED PA10 PB1 PD7 PE0 ---------------------
-    GPIO_InitStruct.Pin = LedPin_D6;
+    GPIO_InitStruct.Pin = LedPin_D6; //white LED = heater
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
     HAL_GPIO_Init(LedGpio_D6, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LedPin_D7;
+    GPIO_InitStruct.Pin = LedPin_D7; //red LED = fan
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
     HAL_GPIO_Init(LedGpio_D7, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = LedPin_D8;
+    GPIO_InitStruct.Pin = LedPin_D8; //green LED = spray
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
