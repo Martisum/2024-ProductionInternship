@@ -7,7 +7,7 @@
 #include "sensors_test.h"
 #include "ST7789v.h"
 #include "menu.h"
-
+#include "rtc.h"
 
 extern TIM_HandleTypeDef htim7;
 extern DEVICE_MODE_T device_mode;
@@ -18,6 +18,14 @@ float HUMI_MAX=90,HUMI_MIN=80,TEMP_MAX=37,TEMP_MIN=30;
 float rt_temp,rt_humidi,rt_lux,rt_pressure; //存储实时温度和湿度
 void offline_control(void);
 void data_capture(void);
+
+RTC_DateTypeDef GetData;  //获取日期结构体
+RTC_TimeTypeDef GetTime;   //获取时间结构体
+
+RTC_DateTypeDef rain_start_date,rain_end_date;
+RTC_TimeTypeDef rain_start_time,rain_end_time;
+info_struct day_info[24];
+uint8_t mark_depression=0,mark_high_humi=0,mark_sud_temp_drop=0,mark_rainy=0;
 
 //-----------------Users application--------------------------
 void LoRaWAN_Func_Process(void)
@@ -146,15 +154,85 @@ void LoRaWAN_Func_Process(void)
 }
 
 void data_capture(void){
+    /* 获取当前实时时间 */
+    HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+    /* 获取当前实时日期 */
+    HAL_RTC_GetDate(&hrtc, &GetData, RTC_FORMAT_BIN);
+
     rt_temp = HDC1000_Read_Temper()*165.0/65536.0-40.0;
     rt_humidi = HDC1000_Read_Humidi()*100/65536.0;
     uint16_t result;
     result = OPT3001_Result();
     rt_lux = 0.01*(1 << ((result & 0xF000) >> 12))*(result & 0xFFF);
     rt_pressure = MPL3115_ReadPressure();
+
+    //记录24h的环境情况
+    day_info[GetTime.Hours].temp=rt_temp;
+    day_info[GetTime.Hours].humidi=rt_humidi;
+    day_info[GetTime.Hours].lux=rt_lux;
+    day_info[GetTime.Hours].pressure=rt_pressure;
 }
 
 void offline_control(void){
+    // /* 显示日期格式 : yy/mm/dd */
+    //   debug_printf("%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
+    //   /* 显示时间格式 : hh:mm:ss */
+    //   debug_printf("%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
+
+    //雨晴推测算法
+    if(day_info[GetTime.Hours].pressure<1000) mark_depression=1;
+    else mark_depression=0;
+
+    if(day_info[GetTime.Hours].humidi>90) mark_high_humi=1;
+    else mark_high_humi=0;
+
+    if(GetTime.Hours>0 && day_info[GetTime.Hours].temp<day_info[GetTime.Hours-1].temp){
+        if(day_info[GetTime.Hours-1].temp-day_info[GetTime.Hours].temp>2) mark_sud_temp_drop=1;
+        else mark_sud_temp_drop=0;
+    }else if(GetTime.Hours==0 && day_info[0].temp<day_info[23].temp){
+        if(day_info[23].temp-day_info[0].temp>2) mark_sud_temp_drop=1;
+        else mark_sud_temp_drop=0;
+    }
+
+    if(mark_depression && mark_high_humi && mark_sud_temp_drop){
+        mark_rainy=1;
+        //记录下雨起始时间
+        rain_start_date.Date=GetData.Date;
+        rain_start_date.Month=GetData.Month;
+        rain_start_date.Year=GetData.Year;
+        rain_start_time.Hours=GetTime.Hours;
+        rain_start_time.Minutes=GetTime.Minutes;
+        rain_start_time.Seconds=GetTime.Seconds;
+
+        rain_end_date.Date=0;
+        rain_end_date.Month=0;
+        rain_end_date.Year=0;
+        rain_end_time.Hours=0;
+        rain_end_time.Minutes=0;
+        rain_end_time.Seconds=0;
+    }
+    else{
+        mark_rainy=0;
+        //记录下雨结束时间
+        rain_end_date.Date=GetData.Date;
+        rain_end_date.Month=GetData.Month;
+        rain_end_date.Year=GetData.Year;
+        rain_end_time.Hours=GetTime.Hours;
+        rain_end_time.Minutes=GetTime.Minutes;
+        rain_end_time.Seconds=GetTime.Seconds;
+
+        //做差计算持续时间
+        //清空起始记录时间
+        // rain_start_date.Date=0;
+        // rain_start_date.Month=0;
+        // rain_start_date.Year=0;
+        // rain_start_time.Hours=0;
+        // rain_start_time.Minutes=0;
+        // rain_start_time.Seconds=0;
+    }
+
+
+
     if(rt_temp<TEMP_MIN){
         //开启加热器关闭风扇，reset是关闭
         HAL_GPIO_WritePin(LedGpio_D6, LedPin_D6, GPIO_PIN_SET);

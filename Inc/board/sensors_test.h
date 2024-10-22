@@ -3,6 +3,7 @@
 
 #include "stm32l4xx_hal.h"
 
+extern int isUpload;
 
 void Test_task(void);
 void HDC1000_Test(void);

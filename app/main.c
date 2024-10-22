@@ -100,6 +100,15 @@ int main(void)
 		
     /* Infinite loop */
     /* USER CODE BEGIN WHILE  */
+
+    //此处可以设置为提前测试好的数据
+    for(uint8_t i=0;i<24;i++){
+        day_info[i].temp=-1;
+        day_info[i].humidi=-1;
+        day_info[i].lux=-1;
+        day_info[i].pressure=-1;
+    }
+
     while (1)
     {
        LoRaWAN_Func_Process();
@@ -125,6 +134,8 @@ void  menu_init ()
             add_func        (&p1, "<pressure-test>",pressure_test);
     }
     {
+        
+            add_value       (&p2, "<isUpload>",&isUpload,1,NULL);
             add_value_float (&p2, "<HUMI_MAX>",&HUMI_MAX,0.5,NULL);
             add_value_float (&p2, "<HUMI_MIN>",&HUMI_MIN,0.5,NULL);
             add_value_float (&p2, "<TEMP_MAX>",&TEMP_MAX,0.5,NULL);

@@ -1,9 +1,18 @@
 #ifndef __APP_H
 #define __APP_H
 #include "stdint.h"
+#include "lorawan_node_driver.h"
 
+typedef struct enviro_info_struct {
+    float temp;
+    float humidi;
+    float lux;
+    float pressure;
+} info_struct;
 
 extern float HUMI_MAX,HUMI_MIN,TEMP_MAX,TEMP_MIN;
+extern down_list_t *pphead;
+extern info_struct day_info[24];
 
 /* 软件版本，升级时修改该信息即可 */
 #define CODE_VERSION "V1.0.3"
@@ -16,7 +25,6 @@ extern float HUMI_MAX,HUMI_MIN,TEMP_MAX,TEMP_MIN;
 
 /** 入网超时时间：120s */
 #define JOIN_TIME_120_SEC  120
-
 
 typedef struct {
     char upcnt[10];

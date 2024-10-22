@@ -7,10 +7,13 @@
 #include "ST7789v.h"
 #include "menu.h"
 #include "XPT2046.h"
+#include "app.h"
+#include "stdbool.h"
 
 extern Pen_Holder Pen_Point;//定义笔实体
 int8_t Error_num = 0;
-uint8_t mark_depression=0,mark_high_humi=0,mark_sud_temp_drop=0,mark_rainy=0;
+uint8_t data_upload[20];
+int isUpload=0;
 
 void Test_task(void)
 {
@@ -238,6 +241,19 @@ void FULL_test(void)
 		float lux = 0;
 		float pressure = 0; 
 		LCD_Clear(WHITE);
+
+		if(isUpload){
+			debug_printf("\r\n[Transperant Mode]\r\n");
+			/* 模块入网判断 */
+			if(nodeJoinNet(JOIN_TIME_120_SEC) == false)
+			{
+				return;
+			}
+			temper = HDC1000_Read_Temper()/1000;
+			nodeDataCommunicate((uint8_t*)&temper,sizeof(temper),&pphead);
+		}
+		
+
 		while(1)
 		{
 			LCD_Cleardata(40,240,0,80);
@@ -273,21 +289,35 @@ void FULL_test(void)
 			HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET);
 			
+			if(isUpload){
+				/* 等待usart2产生中断 */
+				if(UART_TO_PC_RECEIVE_FLAG && GET_BUSY_LEVEL){
+					uint8_t i=1;
+					uint16_t raw_data[4];
 
-			// if(temper>40){
-			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
-			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_SET);
-			// }
-			// else if(temper<30){
-			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
-			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_4,GPIO_PIN_RESET);
-			// }
+					raw_data[0]=temper*100;//考虑小数点
+					raw_data[1]=Humidi*100;
+					raw_data[3]=lux;
+					raw_data[4]=pressure;
+					data_upload[0]=0xAA;
+					for(i=1;i<=8;i++){
+						if(i%2) data_upload[i]=(raw_data[i/2]>>8) & 0xff;
+						else data_upload[i]=raw_data[i/2] & 0xff;
+					}data_upload[9]=0xFF;
 
-			// if(Humidi>90){
-			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_RESET);
-			// }else if(Humidi<80){
-			// 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_3,GPIO_PIN_SET);
-			// }
+					//服务器上报
+					UART_TO_PC_RECEIVE_FLAG = 0;
+					// nodeDataCommunicate((uint8_t*)UART_TO_PC_RECEIVE_BUFFER, UART_TO_PC_RECEIVE_LENGTH, &pphead);
+					nodeDataCommunicate((uint8_t*)data_upload, 10, &pphead);
+				}else if(UART_TO_PC_RECEIVE_FLAG && (GET_BUSY_LEVEL == 0)){
+					UART_TO_PC_RECEIVE_FLAG = 0;
+					debug_printf("--> Warning: Don't send data now! Module is busy!\r\n");
+				}
+				if(UART_TO_LRM_RECEIVE_FLAG){
+					UART_TO_LRM_RECEIVE_FLAG = 0;
+					usart2_send_data(UART_TO_LRM_RECEIVE_BUFFER,UART_TO_LRM_RECEIVE_LENGTH);
+				}
+			}
 			
 			if(Pen_Point.Key_Sta == 1)
 			{
