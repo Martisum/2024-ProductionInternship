@@ -1,10 +1,10 @@
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'LR_TRAIN'
+compiling tim.c...
 compiling key.c...
 ..\src\board\key.c(53): warning:  #223-D: function "delay_10ms" declared implicitly
               delay_10ms(15);  //???
 ..\src\board\key.c: 1 warning, 0 errors
-compiling main.c...
 compiling XPT2046.c...
 ..\src\board\lcd\XPT2046.c(256): warning:  #1035-D: single-precision operand implicitly converted to double-precision
                   if(fac<0.95||fac>1.05||d1==0||d2==0)//²»ºÏ¸ñ
@@ -21,20 +21,43 @@ compiling XPT2046.c...
 ..\src\board\lcd\XPT2046.c(200): warning:  #177-D: variable "num"  was declared but never referenced
       float num=1.2;
 ..\src\board\lcd\XPT2046.c: 7 warnings, 0 errors
-compiling sensors_test.c...
-..\src\board\sensors_test.c(301): warning:  #175-D: subscript out of range
-  					raw_data[4]=pressure;
-..\src\board\sensors_test.c(336): warning: C4488E: write to variable 'raw_data' with offset out of bounds
-}
-..\src\board\sensors_test.c: 2 warnings, 0 errors
+compiling main.c...
+compiling ST7789v.c...
+..\src\board\lcd\ST7789v.c(301): warning:  #177-D: variable "temp"  was declared but never referenced
+      uint8_t temp = 0,temp1 = 0 ;
+..\src\board\lcd\ST7789v.c(301): warning:  #177-D: variable "temp1"  was declared but never referenced
+      uint8_t temp = 0,temp1 = 0 ;
+..\src\board\lcd\ST7789v.c(324): warning:  #550-D: variable "temp"  was set but never used
+      uint8_t temp =0,temp1 = 0;
+..\src\board\lcd\ST7789v.c(324): warning:  #177-D: variable "temp1"  was declared but never referenced
+      uint8_t temp =0,temp1 = 0;
+..\src\board\lcd\ST7789v.c(530): warning:  #550-D: variable "temp"  was set but never used
+      uint16_t temp =0,temp1 = 0 ;
+..\src\board\lcd\ST7789v.c(530): warning:  #177-D: variable "temp1"  was declared but never referenced
+      uint16_t temp =0,temp1 = 0 ;
+..\src\board\lcd\ST7789v.c(534): warning:  #550-D: variable "test"  was set but never used
+      static uint16_t test = 0;
+..\src\board\lcd\ST7789v.c(1032): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "const uint8_t *"
+      LCD_ShowString(x, y, data_buffer,color);
+..\src\board\lcd\ST7789v.c(1078): warning:  #1-D: last line of file ends without a newline
+  }
+..\src\board\lcd\ST7789v.c: 9 warnings, 0 errors
 compiling app.c...
-..\app\app.c(165): warning:  #223-D: function "OPT3001_Result" declared implicitly
+..\app\app.c(153): warning:  #223-D: function "OPT3001_Result" declared implicitly
       result = OPT3001_Result();
-..\app\app.c(167): warning:  #223-D: function "MPL3115_ReadPressure" declared implicitly
+..\app\app.c(155): warning:  #223-D: function "MPL3115_ReadPressure" declared implicitly
       rt_pressure = MPL3115_ReadPressure();
 ..\app\app.c: 2 warnings, 0 errors
+compiling sensors_test.c...
+..\src\board\sensors_test.c(299): warning:  #175-D: subscript out of range
+  					raw_data[4]=pressure;
+..\src\board\sensors_test.c(359): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+      my_lux.pwm_out= 0.01*(my_lux.PS*my_lux.now_error+my_lux.DS*(my_lux.now_error-my_lux.pre_error)+my_lux.IS*my_lux.sum_error);
+..\src\board\sensors_test.c(334): warning: C4488E: write to variable 'raw_data' with offset out of bounds
+}
+..\src\board\sensors_test.c: 3 warnings, 0 errors
 linking...
-Program Size: Code=41896 RO-data=5160 RW-data=188 ZI-data=32796  
+Program Size: Code=43208 RO-data=5160 RW-data=204 ZI-data=32892  
 FromELF: creating hex file...
-"..\..\Obj\SW_KFB.axf" - 0 Error(s), 12 Warning(s).
+"..\..\Obj\SW_KFB.axf" - 0 Error(s), 22 Warning(s).
 Build Time Elapsed:  00:00:05
