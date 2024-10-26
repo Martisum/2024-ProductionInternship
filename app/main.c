@@ -65,7 +65,7 @@ int main(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_RTC_Init();
-    // MX_TIM7_Init();
+//		MX_TIM3_Init();
 
     /** 串口初始化 */
     MX_LPUART1_Init(9600);  //MCU与模块相连串口
@@ -120,7 +120,8 @@ int main(void)
         day_info[i].lux=-1;
         day_info[i].pressure=-1;
     }
-
+//		HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+//		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 0);
     while (1)
     {
        LoRaWAN_Func_Process();

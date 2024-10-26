@@ -48,6 +48,7 @@
 
 extern TIM_HandleTypeDef htim15;
 extern TIM_HandleTypeDef htim7;
+extern TIM_HandleTypeDef htim3;
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -57,6 +58,7 @@ extern void _Error_Handler(char *, int);
 void Tim6_Conf(uint16_t time);      
 void MX_TIM7_Init(void);          
 void MX_TIM15_Init(uint32_t pwm_puty);
+void MX_TIM3_Init(void);
 
 #define SYSCLOCK_FREQ 80000000
 
