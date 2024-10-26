@@ -65,7 +65,7 @@ int main(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_RTC_Init();
-//		MX_TIM3_Init();
+		MX_TIM3_Init();
 
     /** 串口初始化 */
     MX_LPUART1_Init(9600);  //MCU与模块相连串口
@@ -108,8 +108,8 @@ int main(void)
         day_info[i].lux=-1;
         day_info[i].pressure=-1;
     }
-//		HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
-//		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 0);
+		HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 0);
     while (1)
     {
        LoRaWAN_Func_Process();
@@ -130,6 +130,8 @@ void  menu_init ()
             add_func        (&p1, "<Humidi-test>",Humidi_test);
             add_func        (&p1, "<lux-test>",lux_test);
             add_func        (&p1, "<pressure-test>",pressure_test);
+						add_func        (&p1, "<pwm-test>",pwmtest);
+			
     }
     {
         
@@ -138,6 +140,10 @@ void  menu_init ()
             add_value_float (&p2, "<HUMI_MIN> ",&HUMI_MIN,0.5,NULL);
             add_value_float (&p2, "<TEMP_MAX> ",&TEMP_MAX,0.5,NULL);
             add_value_float (&p2, "<TEMP_MIN> ",&TEMP_MIN,0.5,NULL);
+						add_value 			(&p2, "<lux_set> ",&lux_set,100,NULL);
+						add_value_float (&p2, "<lux_kp> ",&lux_kp,0.1,NULL);
+            add_value_float (&p2, "<lux_ki> ",&lux_ki,0.1,NULL);
+            add_value_float (&p2, "<lux_kd> ",&lux_kd,0.1,NULL);
     }
     MenuInit           (&p0);
 }

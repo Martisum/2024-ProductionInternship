@@ -8,12 +8,16 @@
 #include "menu.h"
 #include "XPT2046.h"
 #include "app.h"
+#include "tim.h"
 #include "stdbool.h"
 
 extern Pen_Holder Pen_Point;//定义笔实体
 int8_t Error_num = 0;
 uint8_t data_upload[20];
 int isUpload=0;
+int lux_set= 2500;
+PID my_lux;
+float lux_kp=1.0,lux_ki=0.4,lux_kd=0;
 
 void Test_task(void)
 {
@@ -186,9 +190,12 @@ void lux_test(void)
 {
 		float lux = 0;
 		LCD_Clear(WHITE);
+		my_lux.PS=lux_kp;
+    my_lux.IS=lux_ki;
+    my_lux.DS=lux_kd;
 		while(1)
 		{	
-			LCD_Cleardata(42,240,0,20);
+			LCD_Clear(WHITE);
 			uint16_t result;
 			result = OPT3001_Result();
 			lux = 0.01*(1 << ((result & 0xF000) >> 12))*(result & 0xFFF);
@@ -205,8 +212,9 @@ void lux_test(void)
 					 return;
 				 }
 			}
+			lux_pid(lux_set,lux);
 			key_show(0);
-			HAL_Delay(500);
+			HAL_Delay(50);
 		}    
 }
 void pressure_test(void)
@@ -308,7 +316,7 @@ void FULL_test(void)
 					usart2_send_data(UART_TO_LRM_RECEIVE_BUFFER,UART_TO_LRM_RECEIVE_LENGTH);
 				}
 			}
-			LCD_ShowString(10,62,"Rain",BLACK);	
+//			LCD_ShowString(10,62,"Rain",BLACK);	
 			if(Pen_Point.Key_Sta == 1)
 			{
 					Pen_Point.Key_Sta =0;
@@ -339,3 +347,46 @@ void LORA_NODE_Test(void)
 #endif
 }
 
+void lux_pid(int16_t luxset,float now_lux){
+
+    my_lux.set_targetS=luxset;
+    my_lux.now_error= my_lux.set_targetS - now_lux;
+
+    my_lux.sum_error+=my_lux.now_error;
+    if(my_lux.sum_error>20000) my_lux.sum_error=20000;
+    else if(my_lux.sum_error<-20000) my_lux.sum_error=-20000;
+
+    my_lux.pwm_out= 0.01*(my_lux.PS*my_lux.now_error+my_lux.DS*(my_lux.now_error-my_lux.pre_error)+my_lux.IS*my_lux.sum_error);
+    if(my_lux.pwm_out>180) my_lux.pwm_out=180;
+    else if(my_lux.pwm_out<0) my_lux.pwm_out= 0;
+		
+	
+		LCD_ShowFloat(10,32,my_lux.pwm_out,4,2,BLACK);
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, my_lux.pwm_out);
+    my_lux.pre_error=my_lux.now_error;
+}
+
+void pwmtest(void){
+	float pwm = 0;
+	while(1){
+		LCD_Clear(WHITE);
+		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pwm);
+		if(Pen_Point.Key_Sta == 1)
+		{
+				Pen_Point.Key_Sta =0;
+				float posx = Pen_Point.X*240.0/2048.0;
+				float posy = 360-Pen_Point.Y*360.0/2048.0;
+				if(posx>=170 && posx <=220 && posy>=280 && posy<=320)
+			 {
+				 __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 0);
+				 MenuRender(1);
+				 return;
+			 }
+		}
+		key_show(0);
+		pwm++;
+		if(pwm>=200)pwm=0;
+		LCD_ShowFloat(10,0,pwm,5,1,BLACK);	
+		HAL_Delay(100);
+	}
+}
