@@ -14,7 +14,6 @@
         "usart.h": "c",
         "hdc1000.h": "c",
         "sensors_test.h": "c",
-        "rtc.h": "c",
-        "stdio.h": "c"
+        "rtc.h": "c"
     }
 }

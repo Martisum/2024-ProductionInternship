@@ -16,7 +16,6 @@ void Humidi_test(void);
 void lux_test(void);
 void pressure_test(void);
 void FULL_test(void);
-void speculates(void);
 
 #endif
 
