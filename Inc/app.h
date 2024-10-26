@@ -13,6 +13,10 @@ typedef struct enviro_info_struct {
 extern float HUMI_MAX,HUMI_MIN,TEMP_MAX,TEMP_MIN;
 extern down_list_t *pphead;
 extern info_struct day_info[24];
+extern RTC_DateTypeDef GetData;  //获取日期结构体
+extern RTC_TimeTypeDef GetTime;   //获取时间结构体
+extern uint8_t mark_depression,mark_high_humi,mark_sud_temp_drop,mark_rainy;
+extern uint8_t test_date;
 
 /* 软件版本，升级时修改该信息即可 */
 #define CODE_VERSION "V1.0.3"

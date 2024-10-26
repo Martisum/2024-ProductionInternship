@@ -35,6 +35,7 @@ void pressure_test(void);
 void FULL_test(void);
 void lux_pid(int16_t lux,float now_lux);
 void pwmtest(void);
+void speculates(void);
 
 #endif
 
