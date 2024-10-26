@@ -101,6 +101,18 @@ int main(void)
     /* Infinite loop */
     /* USER CODE BEGIN WHILE  */
 
+    //时间初始化（设置完毕后注释掉）
+    // RTC_TimeTypeDef setTime;
+    // RTC_DateTypeDef setData;
+    // setTime.Hours=15;
+    // setTime.Minutes=4;
+    // setTime.Seconds=30;
+    // setData.Year=24;
+    // setData.Month=10;
+    // setData.Date=26;
+    // HAL_RTC_SetTime(&hrtc,&setTime,RTC_FORMAT_BIN);
+    // HAL_RTC_SetDate(&hrtc,&setData,RTC_FORMAT_BIN);
+
     //此处可以设置为提前测试好的数据
     for(uint8_t i=0;i<24;i++){
         day_info[i].temp=-1;
@@ -124,6 +136,7 @@ void  menu_init ()
 
     }
     {
+            add_func        (&p1, "<speculates>",speculates);
             add_func        (&p1, "<FULL-test>",FULL_test);
             add_func        (&p1, "<temper-test>", temper_test);
             add_func        (&p1, "<Humidi-test>",Humidi_test);
@@ -131,7 +144,8 @@ void  menu_init ()
             add_func        (&p1, "<pressure-test>",pressure_test);
     }
     {
-        
+            
+            add_value       (&p2, "<test_date> ",(int *)&test_date,1,NULL);
             add_value       (&p2, "<isUpload> ",&isUpload,1,NULL);
             add_value_float (&p2, "<HUMI_MAX> ",&HUMI_MAX,0.5,NULL);
             add_value_float (&p2, "<HUMI_MIN> ",&HUMI_MIN,0.5,NULL);

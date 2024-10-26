@@ -8,6 +8,7 @@
 #include "ST7789v.h"
 #include "menu.h"
 #include "rtc.h"
+#include "stdio.h"
 
 extern TIM_HandleTypeDef htim7;
 extern DEVICE_MODE_T device_mode;
@@ -16,6 +17,7 @@ down_list_t *pphead = NULL;
 
 float HUMI_MAX=90,HUMI_MIN=80,TEMP_MAX=37,TEMP_MIN=30;
 float rt_temp,rt_humidi,rt_lux,rt_pressure; //存储实时温度和湿度
+uint8_t test_date=0; //0表示不启用提前测试的数据
 void offline_control(void);
 void data_capture(void);
 
@@ -26,6 +28,11 @@ RTC_DateTypeDef rain_start_date,rain_end_date;
 RTC_TimeTypeDef rain_start_time,rain_end_time;
 info_struct day_info[24];
 uint8_t mark_depression=0,mark_high_humi=0,mark_sud_temp_drop=0,mark_rainy=0;
+
+uint8_t abs_distance(uint8_t a,uint8_t b){
+    if(a>b) return b-a;
+    else return a-b;
+}
 
 //-----------------Users application--------------------------
 void LoRaWAN_Func_Process(void)
@@ -184,7 +191,7 @@ void offline_control(void){
     }
 
     if(mark_depression && mark_high_humi && mark_sud_temp_drop){
-        mark_rainy=1;
+        // mark_rainy=1;
         //记录下雨起始时间
         rain_start_date.Date=GetData.Date;
         rain_start_date.Month=GetData.Month;
@@ -201,7 +208,7 @@ void offline_control(void){
         rain_end_time.Seconds=0;
     }
     else{
-        mark_rainy=0;
+        // mark_rainy=0;
         //记录下雨结束时间
         rain_end_date.Date=GetData.Date;
         rain_end_date.Month=GetData.Month;
@@ -210,14 +217,43 @@ void offline_control(void){
         rain_end_time.Minutes=GetTime.Minutes;
         rain_end_time.Seconds=GetTime.Seconds;
 
-        //做差计算持续时间
-        //清空起始记录时间
-        // rain_start_date.Date=0;
-        // rain_start_date.Month=0;
-        // rain_start_date.Year=0;
-        // rain_start_time.Hours=0;
-        // rain_start_time.Minutes=0;
-        // rain_start_time.Seconds=0;
+        //下雨判断逻辑
+        //跨度一年、一月、一天以上，必定超过两小时
+        if(abs_distance(rain_start_date.Date,rain_end_date.Date)>1){
+            mark_rainy=1;
+        }else if(abs_distance(rain_start_date.Month,rain_end_date.Month)>1){
+            mark_rainy=1;
+        }else if(abs_distance(rain_start_date.Year,rain_end_date.Year)>1){
+            mark_rainy=1;
+        }
+
+        if(abs_distance(rain_start_date.Year,rain_end_date.Year)==1){ //跨度刚好一年，可能是除夕夜到正月初一
+            //前面的三个并列判断已经保证了起始和结束日期数字差距不会大于1，因此可以直接判断
+            if(rain_start_date.Month!=12 && rain_start_date.Month!=1){
+                if(rain_start_date.Date<29 && rain_start_date.Date!=1){
+                    mark_rainy=1;
+                }else{
+                    mark_rainy=0;
+                }
+            }
+        }else{ //如果为0，说明是同一年
+            if(abs_distance(rain_start_date.Month,rain_end_date.Month)==1){ //跨度刚好一个月，可能是月末到月初
+                if(rain_start_date.Month!=12 && rain_start_date.Month!=1){
+                    mark_rainy=1;
+                }else{
+                    mark_rainy=0;
+                }
+            }else{ //如果为0，说明是同一月
+                if(abs_distance(rain_start_date.Date,rain_end_date.Date)==1){ //跨度刚好一天，可能是昨天到今天
+                    if(rain_start_time.Hours!=23 && rain_start_time.Hours!=0){
+                        mark_rainy=1;
+                    }else mark_rainy=0;
+                }else{
+                    if(abs_distance(rain_start_time.Hours,rain_end_time.Hours)>=2) mark_rainy=1;
+                    else mark_rainy=0;
+                }
+            }
+        }
     }
 
 

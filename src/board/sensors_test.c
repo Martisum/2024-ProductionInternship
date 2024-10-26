@@ -9,6 +9,7 @@
 #include "XPT2046.h"
 #include "app.h"
 #include "stdbool.h"
+#include "stdio.h"
 
 extern Pen_Holder Pen_Point;//定义笔实体
 int8_t Error_num = 0;
@@ -234,6 +235,78 @@ void pressure_test(void)
 			HAL_Delay(500);
 		}    
 }
+
+void speculates(void)
+{
+		LCD_Clear(WHITE);
+
+		//启用1号测试数据
+		if(test_date==1){
+			day_info[0].temp=26;	day_info[0].humidi=92;	day_info[0].pressure=901;
+			day_info[1].temp=26;	day_info[1].humidi=92;	day_info[1].pressure=887;
+			day_info[2].temp=26;	day_info[2].humidi=95;	day_info[2].pressure=897;
+			day_info[3].temp=25;	day_info[3].humidi=97;	day_info[3].pressure=906;
+			day_info[4].temp=25;	day_info[4].humidi=95;	day_info[4].pressure=918;
+			day_info[5].temp=23;	day_info[5].humidi=94;	day_info[5].pressure=890;
+			day_info[6].temp=23;	day_info[6].humidi=96;	day_info[6].pressure=891;
+			day_info[7].temp=24;	day_info[7].humidi=92;	day_info[7].pressure=897;
+			day_info[8].temp=24;	day_info[8].humidi=97;	day_info[8].pressure=895;
+			day_info[9].temp=24;	day_info[9].humidi=97;	day_info[9].pressure=904;
+			day_info[10].temp=25;	day_info[10].humidi=92;	day_info[10].pressure=903;
+			day_info[11].temp=25;	day_info[11].humidi=90;	day_info[11].pressure=896;
+
+			day_info[12].temp=25;	day_info[12].humidi=99;	day_info[12].pressure=897;
+			day_info[13].temp=25;	day_info[13].humidi=96;	day_info[13].pressure=899;
+			day_info[14].temp=25;	day_info[14].humidi=94;	day_info[14].pressure=902;
+			day_info[15].temp=23;	day_info[15].humidi=94;	day_info[15].pressure=910;
+			day_info[16].temp=23;	day_info[16].humidi=99;	day_info[16].pressure=913;
+			day_info[17].temp=23;	day_info[17].humidi=94;	day_info[17].pressure=904;
+			day_info[18].temp=23;	day_info[18].humidi=96;	day_info[18].pressure=904;
+			day_info[19].temp=24;	day_info[19].humidi=92;	day_info[19].pressure=902;
+			day_info[20].temp=24;	day_info[20].humidi=91;	day_info[20].pressure=896;
+			day_info[21].temp=24;	day_info[21].humidi=90;	day_info[21].pressure=897;
+			day_info[22].temp=24;	day_info[22].humidi=91;	day_info[22].pressure=890;
+			day_info[23].temp=24;	day_info[23].humidi=92;	day_info[23].pressure=899;
+		}
+
+		while(1)
+		{	
+			static char tmp_str[30]={0}; //临时使用字符串
+			static uint8_t cycle_cnt=0;
+        	cycle_cnt++;
+			if(cycle_cnt % 25 == 0){
+				//雨晴推测数据打印
+				LCD_Fill(10,10,160,100,WHITE);
+        	}
+			sprintf(tmp_str,"%02d/%02d/%02d",2000 + GetData.Year, GetData.Month, GetData.Date);
+			LCD_ShowString(10,10,(const uint8_t *)tmp_str,BLACK);
+			sprintf(tmp_str,"%02d:%02d",GetTime.Hours, GetTime.Minutes);
+			LCD_ShowString(10,25,(const uint8_t *)tmp_str,BLACK);
+			sprintf(tmp_str,"depression:%d",mark_depression);
+			LCD_ShowString(10,40,(const uint8_t *)tmp_str,BLACK);
+			sprintf(tmp_str,"high_humi:%d",mark_high_humi);
+			LCD_ShowString(10,55,(const uint8_t *)tmp_str,BLACK);
+			sprintf(tmp_str,"sud_temp_drop:%d",mark_sud_temp_drop);
+			LCD_ShowString(10,70,(const uint8_t *)tmp_str,BLACK);
+			sprintf(tmp_str,"rainy:%d",mark_rainy);
+			LCD_ShowString(10,85,(const uint8_t *)tmp_str,BLACK);
+
+			if(Pen_Point.Key_Sta == 1)
+			{
+				Pen_Point.Key_Sta =0;
+				float posx = Pen_Point.X*240.0/2048.0;
+				float posy = 360-Pen_Point.Y*360.0/2048.0;
+				if(posx>=170 && posx <=220 && posy>=280 && posy<=320)
+				{
+					MenuRender(1);
+					return;
+				}
+			}
+			key_show(0);
+			HAL_Delay(500);
+		}    
+}
+
 void FULL_test(void)
 {
 		float temper = 0;
@@ -308,7 +381,7 @@ void FULL_test(void)
 					usart2_send_data(UART_TO_LRM_RECEIVE_BUFFER,UART_TO_LRM_RECEIVE_LENGTH);
 				}
 			}
-			LCD_ShowString(10,62,"Rain",BLACK);	
+			// LCD_ShowString(10,62,"Rain",BLACK);	
 			if(Pen_Point.Key_Sta == 1)
 			{
 					Pen_Point.Key_Sta =0;
